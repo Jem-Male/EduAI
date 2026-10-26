@@ -12,6 +12,7 @@ class AnswerResult(models.TextChoices):
 class Course(models.Model):
     title = models.CharField(max_length=250, verbose_name="Course name")
     description = models.TextField(verbose_name="Course deconstruct")
+    image = models.ImageField(upload_to='lessons/images/', null=True, blank=True)
     creater = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -99,7 +100,7 @@ class QuizOption(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='options')
     options_test = models.CharField(max_length=150, verbose_name="Option Text")
     is_correct = models.BooleanField(default=False, verbose_name="Is Correct?")
-    ai_feedback = models.CharField(max_length=250, null=True)
+    feedback = models.CharField(max_length=250, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
