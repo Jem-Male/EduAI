@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.db.models import Max 
 
 
@@ -13,7 +13,7 @@ class Course(models.Model):
     title = models.CharField(max_length=250, verbose_name="Course name")
     description = models.TextField(verbose_name="Course deconstruct")
     image = models.ImageField(upload_to='lessons/images/', null=True, blank=True)
-    creater = models.ForeignKey(User, on_delete=models.CASCADE)
+    creater = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
@@ -78,7 +78,7 @@ class Quiz(models.Model):
 
 
 class SubmissionTask(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     student_answer = models.TextField()
     
@@ -108,7 +108,7 @@ class QuizOption(models.Model):
 
 
 class SubmissionQuiz(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     student_answer = models.ForeignKey(QuizOption, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
