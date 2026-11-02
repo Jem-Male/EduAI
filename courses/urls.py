@@ -1,5 +1,12 @@
-from django.urls import path
-from .views import get_hello, post, query, patch, safe_query, ItemAPIView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+
+from .views import get_hello, post, query, patch, safe_query, CourseAPIView, LessonAPIViews
+
+
+router = DefaultRouter()
+
+router.register(r'lessons', LessonAPIViews, basename='lesson')
 
 urlpatterns = [
     path('hel/', get_hello, name='hello'), 
@@ -7,6 +14,7 @@ urlpatterns = [
     path('q/', query, name='query'),
     path('patch/<str:name>/', patch, name='patch'),
     path('sq/', safe_query, name='safe_query'),
-    path('vi/<int:item_id>/', ItemAPIView.as_view()),
-    path('vi/', ItemAPIView.as_view()),
+    path('courses/<int:pk>/', CourseAPIView.as_view()),
+    path('courses/', CourseAPIView.as_view()),
+    path('', include(router.urls)),
 ]
