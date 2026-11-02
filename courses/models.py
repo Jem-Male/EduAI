@@ -31,8 +31,7 @@ class Lesson(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.position:
-            max_position = Lesson.objects.filter(course=self.course).aggregate(Max('position'))['position__max']
-            self.position = (max_position or 0) + 1
+            self.position = get_next_positions(self.course)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -47,12 +46,10 @@ class Task(models.Model):
     image = models.ImageField(upload_to='tasks/images/', null=True, blank=True)
     video = models.FileField(upload_to='tasks/video/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    
-        
+            
     def save(self, *args, **kwargs):
         if not self.position:
-            max_position = Lesson.objects.filter(course=self.course).aggregate(Max('position'))['position__max']
-            self.position = (max_position or 0) + 1    
+            self.position = get_next_positions(self.course)
         super().save(*args, **kwargs)
     
     def __str__(self):
@@ -66,11 +63,10 @@ class Quiz(models.Model):
     question_text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
-        
+
     def save(self, *args, **kwargs):
         if not self.position:
-            max_position = Lesson.objects.filter(course=self.course).aggregate(Max('position'))['position__max']
-            self.position = (max_position or 0) + 1            
+            self.position = get_next_positions(self.course)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -115,3 +111,11 @@ class SubmissionQuiz(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.quiz.answer} ({self.student_answer.is_correct})"
+    
+
+def get_next_positions(course):
+    return max(
+        Lesson.objects.filter(course=course).aggregate(Max('position'))['position__max'] or 0,
+        Task.objects.filter(course=course).aggregate(Max('position'))['position__max'] or 0,
+        Quiz.objects.filter(course=course).aggregate(Max('position'))['position__max'] or 0
+    ) + 1
