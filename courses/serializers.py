@@ -1,8 +1,6 @@
-from django.db import models
-from django.contrib.auth.models import User
-from django.db.models import Max 
 from rest_framework import serializers
 from .models import Course, Lesson, Task, Quiz, QuizOption, SubmissionTask, SubmissionQuiz
+from rest_framework.exceptions import ValidationError
 
 
 class LessonSerializer(serializers.ModelSerializer):
@@ -10,6 +8,12 @@ class LessonSerializer(serializers.ModelSerializer):
         model = Lesson
         fields = ['id', 'course', 'position', 'title', 'description', 'image', 'video', 'created_at']
         read_only_fields = ['position', 'created_at']
+    
+    def validate_course(self, value):
+        user = self.context['request'].user
+        if value.creater != user and not user.is_superuser:
+            raise ValidationError("You cannot add lessons to someone else's course!")
+        return value
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -17,6 +21,12 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = ['id', 'course', 'position', 'title', 'question_text', 'image', 'video', 'created_at']
         read_only_fields = ['position', 'created_at']
+    
+    def validate_course(self, value):
+        user = self.context['request'].user
+        if value.creater != user and not user.is_superuser:
+            raise ValidationError("You cannot add tasks to someone else's course!")
+        return value
 
 
 class QuizOptionSerializer(serializers.ModelSerializer):
@@ -24,8 +34,13 @@ class QuizOptionSerializer(serializers.ModelSerializer):
         model = QuizOption
         fields = ['id', 'quiz', 'options_test', 'is_correct', 'feedback', 'created_at']
         read_only_fields = ['created_at']
-        
         extra_kwargs = {'is_correct': {'write_only': True}}
+        
+    def validate_quiz(self, value):
+        user = self.context['request'].user
+        if value.course.creater != user and not user.is_superuser:
+            raise ValidationError("You cannot add options to someone else's quiz!")
+        return value
 
 
 class QuizSerializer(serializers.ModelSerializer):
@@ -35,6 +50,12 @@ class QuizSerializer(serializers.ModelSerializer):
         model = Quiz
         fields = ['id', 'course', 'position', 'answer', 'question_text', 'options', 'created_at']
         read_only_fields = ['position', 'created_at']
+    
+    def validate_course(self, value):
+        user = self.context['request'].user
+        if value.creater != user and not user.is_superuser:
+            raise ValidationError("You cannot add quizzes to someone else's course!")
+        return value
 
 
 class CourseSerializer(serializers.ModelSerializer):

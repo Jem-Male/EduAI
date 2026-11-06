@@ -46,7 +46,7 @@ class Task(models.Model):
     image = models.ImageField(upload_to='tasks/images/', null=True, blank=True)
     video = models.FileField(upload_to='tasks/video/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-            
+    
     def save(self, *args, **kwargs):
         if not self.position:
             self.position = get_next_positions(self.course)
@@ -62,7 +62,6 @@ class Quiz(models.Model):
     answer = models.CharField(max_length=200)
     question_text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-
 
     def save(self, *args, **kwargs):
         if not self.position:
@@ -95,7 +94,7 @@ class SubmissionTask(models.Model):
 class QuizOption(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='options')
     options_test = models.CharField(max_length=150, verbose_name="Option Text")
-    is_correct = models.BooleanField(default=False, verbose_name="Is Correct?")
+    is_correct = models.BooleanField(default=False, verbose_name="Is Correct")
     feedback = models.CharField(max_length=250, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -111,7 +110,7 @@ class SubmissionQuiz(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.quiz.answer} ({self.student_answer.is_correct})"
-    
+
 
 def get_next_positions(course):
     return max(
