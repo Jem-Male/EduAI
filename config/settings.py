@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+import json
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -90,8 +91,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': os.getenv('DB_ENGINE', 'django.db.backends.postgresql'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 
@@ -136,3 +141,31 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+AI_API_KEY = os.getenv("AI_API_KEY")
+AI_MODEL = os.getenv("AI_MODEL")
+AI_URL = os.getenv("AI_URL")
+
+if not all([AI_API_KEY, AI_MODEL, AI_URL]):
+    raise ValueError("Error: Required keys are missing from the .env file (AI_API_KEY, AI_MODEL, AI_URL)")
+
+INSTRUCTIONS_FILE = BASE_DIR / "instructions.json"
+
+if not INSTRUCTIONS_FILE.exists():
+    raise FileNotFoundError(f"Error: Configuration file {INSTRUCTIONS_FILE} not found!")
+
+with open(INSTRUCTIONS_FILE, "r", encoding="utf-8") as f:
+    _all_instructions = json.load(f)
+
+COURSE_PROMPTS = _all_instructions.get("course_service", {})

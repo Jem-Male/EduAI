@@ -53,7 +53,6 @@ class TaskAPIViews(ModelViewSet):
         return Task.objects.filter(course__creater=user)
     
 
-
 class QuizAPIViews(ModelViewSet):
     serializer_class = QuizSerializer
     permission_classes = [IsAdminOrTeacherOrReadOnly]
@@ -65,7 +64,7 @@ class QuizAPIViews(ModelViewSet):
         return Quiz.objects.filter(course__creater=user)
 
 
-class SubmissionTaskViewSet(ModelViewSet):
+class SubmissionTaskAPIView(ModelViewSet):
     serializer_class = SubmissionTaskSerializer
     permission_classes = [IsSlover]
     
@@ -81,6 +80,7 @@ class SubmissionTaskViewSet(ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
 
 class QuizOptionAPIView(ModelViewSet):
     serializer_class = QuizOptionSerializer
