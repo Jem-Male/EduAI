@@ -15,19 +15,19 @@ class IsAdminOrTeacherOrReadOnly(permissions.BasePermission):
         if request.user.is_superuser:
             return True
         
-        if hasattr(obj, 'creater'):
-            return obj.creater == request.user
+        if hasattr(obj, 'creator'):
+            return obj.creator == request.user
         
         if hasattr(obj, 'course'):
-            return obj.course.creater == request.user
+            return obj.course.creator == request.user
         
         if hasattr(obj, 'quiz'):
-            return obj.quiz.course.creater == request.user
+            return obj.quiz.course.creator == request.user
         
         return False
 
 
-class IsSlover(permissions.BasePermission):
+class IsSolver(permissions.BasePermission):
     def has_permission(self, request, view): # type: ignore
         return (
             request.user.is_authenticated

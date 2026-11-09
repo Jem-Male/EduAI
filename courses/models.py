@@ -23,10 +23,11 @@ class Category(models.Model):
 
 class Course(models.Model):
     title = models.CharField(max_length=250, verbose_name="Course name")
-    category = models.ForeignKey(Category, on_delete=models.PROTECT)
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, null=True, blank=True)
     description = models.TextField(verbose_name="Course deconstruct")
     image = models.ImageField(upload_to='lessons/images/', null=True, blank=True)
-    creater = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    ai_course = models.BooleanField(default=False, verbose_name="the course was created by AI")
     created_at = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
@@ -72,7 +73,6 @@ class Task(models.Model):
 class Quiz(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='quizzes')
     position = models.PositiveIntegerField(default=0, editable=False)
-    answer = models.CharField(max_length=200)
     question_text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 

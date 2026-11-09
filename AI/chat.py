@@ -2,23 +2,19 @@ from django.conf import settings
 from .client import openai_client
 from.models import AiInstruction
 
-class AI():
+class AI:
     @classmethod
     def get_chat_response(cls, prompt: str, system_instruction: str | None = None) -> str:
-        try:
-            msg = []
-            if system_instruction:
-                msg.append({"role": "system", "content": system_instruction})
-                
-            msg.append({"role": "user", "content": prompt})
-            response = openai_client.chat.completions.create(
-                model=settings.AI_MODEL,
-                messages=msg
-            )
-            return response.choices[0].message.content or ""
+        msg = []
+        if system_instruction:
+            msg.append({"role": "system", "content": system_instruction})
+        msg.append({"role": "user", "content": prompt})
 
-        except Exception as e:
-            return f'Err: {e}'
+        response = openai_client.chat.completions.create(
+            model=settings.AI_MODEL,
+            messages=msg,
+        )
+        return response.choices[0].message.content or ""
 
 
     @classmethod

@@ -7,7 +7,8 @@ from .views import (
     TaskAPIViews,
     QuizAPIViews,
     QuizOptionAPIView,
-    SubmissionTaskAPIView
+    SubmissionTaskAPIView,
+    AiCourseAPIView
 )
 
 
@@ -22,4 +23,5 @@ router.register(r'submissions', SubmissionTaskAPIView, basename='submission')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('ai/', AiCourseAPIView.as_view()),
 ]

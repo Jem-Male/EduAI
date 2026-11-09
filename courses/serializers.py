@@ -11,7 +11,7 @@ class LessonSerializer(serializers.ModelSerializer):
     
     def validate_course(self, value):
         user = self.context['request'].user
-        if value.creater != user and not user.is_superuser:
+        if value.creator != user and not user.is_superuser:
             raise ValidationError("You cannot add lessons to someone else's course!")
         return value
 
@@ -24,7 +24,7 @@ class TaskSerializer(serializers.ModelSerializer):
     
     def validate_course(self, value):
         user = self.context['request'].user
-        if value.creater != user and not user.is_superuser:
+        if value.creator != user and not user.is_superuser:
             raise ValidationError("You cannot add tasks to someone else's course!")
         return value
 
@@ -38,7 +38,7 @@ class QuizOptionSerializer(serializers.ModelSerializer):
         
     def validate_quiz(self, value):
         user = self.context['request'].user
-        if value.course.creater != user and not user.is_superuser:
+        if value.course.creator != user and not user.is_superuser:
             raise ValidationError("You cannot add options to someone else's quiz!")
         return value
 
@@ -53,7 +53,7 @@ class QuizSerializer(serializers.ModelSerializer):
     
     def validate_course(self, value):
         user = self.context['request'].user
-        if value.creater != user and not user.is_superuser:
+        if value.creator != user and not user.is_superuser:
             raise ValidationError("You cannot add quizzes to someone else's course!")
         return value
 
@@ -61,8 +61,8 @@ class QuizSerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        fields = ['id', 'title', 'description', 'image', 'creater', 'created_at']
-        read_only_fields = ['creater', 'created_at']
+        fields = ['id', 'title', 'description', 'image', 'creator', 'created_at']
+        read_only_fields = ['creator', 'created_at']
 
 
 class CourseDetailSerializer(serializers.ModelSerializer):
@@ -73,10 +73,10 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = [
-            'id', 'title', 'description', 'image', 'creater', 
+            'id', 'title', 'description', 'image', 'creator', 
             'lessons', 'tasks', 'quizzes', 'created_at'
         ]
-        read_only_fields = ['creater', 'created_at']
+        read_only_fields = ['creator', 'created_at']
 
 
 class SubmissionTaskSerializer(serializers.ModelSerializer):
