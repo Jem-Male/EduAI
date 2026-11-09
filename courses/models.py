@@ -9,8 +9,21 @@ class AnswerResult(models.TextChoices):
     CORRECT = 'correct', 'Correct'
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(null=True, blank=True)
+    
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+    
+    def __str__(self):
+        return self.name
+
+
 class Course(models.Model):
     title = models.CharField(max_length=250, verbose_name="Course name")
+    category = models.ForeignKey(Category, on_delete=models.PROTECT)
     description = models.TextField(verbose_name="Course deconstruct")
     image = models.ImageField(upload_to='lessons/images/', null=True, blank=True)
     creater = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -82,7 +95,7 @@ class SubmissionTask(models.Model):
         choices=AnswerResult.choices,
         null=True,
         blank=True,
-        verbose_name="Результат ответа"
+        verbose_name="answer result"
     )
     ai_feedback = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'courses', 
     'users',
+    'ai'
 ]
 
 AUTH_USER_MODEL = 'users.User'
@@ -151,21 +152,9 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 AI_API_KEY = os.getenv("AI_API_KEY")
 AI_MODEL = os.getenv("AI_MODEL")
-AI_URL = os.getenv("AI_URL")
+AI_URL = os.getenv("AI_BASE_URL")
 
 if not all([AI_API_KEY, AI_MODEL, AI_URL]):
     raise ValueError("Error: Required keys are missing from the .env file (AI_API_KEY, AI_MODEL, AI_URL)")
-
-INSTRUCTIONS_FILE = BASE_DIR / "instructions.json"
-
-if not INSTRUCTIONS_FILE.exists():
-    raise FileNotFoundError(f"Error: Configuration file {INSTRUCTIONS_FILE} not found!")
-
-with open(INSTRUCTIONS_FILE, "r", encoding="utf-8") as f:
-    _all_instructions = json.load(f)
-
-COURSE_PROMPTS = _all_instructions.get("course_service", {})
