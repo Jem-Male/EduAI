@@ -9,7 +9,6 @@ class User(AbstractUser):
         blank=False,
         verbose_name='User email'
     )
-    
     username = models.CharField(
         max_length=150,
         unique=True,
@@ -18,6 +17,12 @@ class User(AbstractUser):
         verbose_name='User user name'
     )
     
-    USERNAME_FIELD = 'email'
+    LIMIT_CHOICES = [(i, str(i)) for i in range(0, 101)]
     
+    ai_limit = models.IntegerField(
+        choices=LIMIT_CHOICES,
+        default=3
+    )
+    
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
