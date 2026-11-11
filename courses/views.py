@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+from django.db import transaction
 
 from .models import Course, Lesson, Task, Quiz, QuizOption, SubmissionTask, SubmissionQuiz
 from .serializers import (
@@ -14,7 +15,8 @@ from .serializers import (
     QuizOptionSerializer,
     SubmissionTaskSerializer,
     SubmissionQuizSerializer,
-    CourseDetailSerializer
+    CourseDetailSerializer,
+    CourseRequestSerializer
 )
 from .permissions import IsAdminOrTeacherOrReadOnly, IsSolver
 from ai.agent import (
@@ -23,6 +25,7 @@ from ai.agent import (
     generate_task_plan
 )
 from ai.course import CreateCoursePlan
+from users.models import User
 
 
 class CourseAPIView(ModelViewSet):
@@ -118,13 +121,22 @@ class AiCourseAPIView(APIView):
     
     def post(self, request):
         user = request.user
-        topic = request.data.get('topic')
-        cours = generate_course_plan(topic)
-        db_cours = CreateCoursePlan.save_course_plan(cours, user)
-        less = generate_lesson_plan(topic)
-        CreateCoursePlan.save_lesson_plan(less, db_cours)
-        task = generate_task_plan(topic)
-        CreateCoursePlan.save_task_plan(task, db_cours)
+        if user.ai_limit <= 0:
+            return Response({"error": "AI request limit exceeded"}, status=status.HTTP_403_FORBIDDEN)
+
+        incoming = CourseRequestSerializer(data=request.data)
+        incoming.is_valid(raise_exception=True)
+        topic = incoming.validated_data["topic"] # type: ignore
         
-        serializer = CourseDetailSerializer(db_cours)
-        return Response(serializer.data)
+        course_plan = generate_course_plan(topic) # type: ignore
+        less_plan = generate_lesson_plan(topic) # type: ignore
+        task = generate_task_plan(topic, less_plan) # type: ignore
+        
+        with transaction.atomic():
+            course = CreateCoursePlan.save_course_plan(course_plan, user) # type: ignore            
+            CreateCoursePlan.save_lesson_plan(less_plan, course)
+            CreateCoursePlan.save_task_plan(task, course)
+            CourseDetailSerializer(course)
+            user.ai_limit -= 1
+            user.save(update_fields=["ai_limit"])
+        return Response(CourseDetailSerializer(course).data)

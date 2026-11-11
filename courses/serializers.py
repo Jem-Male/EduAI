@@ -91,3 +91,7 @@ class SubmissionQuizSerializer(serializers.ModelSerializer):
         model = SubmissionQuiz
         fields = ['id', 'user', 'quiz', 'student_answer', 'created_at']
         read_only_fields = ['user', 'created_at']
+    
+
+class CourseRequestSerializer(serializers.Serializer):
+    topic = serializers.CharField(max_length=300)

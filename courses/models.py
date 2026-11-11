@@ -122,7 +122,7 @@ class SubmissionQuiz(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.quiz.answer} ({self.student_answer.is_correct})"
+        return f"{self.user.username} - {self.quiz.question_text} ({self.student_answer.is_correct})"
 
 
 def get_next_positions(course):
